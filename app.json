@@ -36,6 +36,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "d31aca27-ad10-455e-afb6-a14689f3803b"
+      }
+    },
+    "owner": "jeremyjones"
   }
 }
