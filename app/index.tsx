@@ -9,7 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 // Empêcher le splash screen de se cacher automatiquement
 SplashScreen.preventAutoHideAsync();
 
-export default function LoginScreen() {
+export default function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
@@ -41,7 +41,7 @@ export default function LoginScreen() {
   }
 
   const handleLogin = () => {
-    router.replace('/screens/HomeScreen');
+    router.replace('/screens/OnboardingScreen');
   };
 
   return (
@@ -98,9 +98,9 @@ export default function LoginScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.googleButtonContainer} onPress={() => {}}>
-            <View style={styles.googleButtonInner}>
-              <Text style={styles.googleButtonText}>Sign In with Google</Text>
-            </View>
+          <View style={styles.googleButtonInner}>
+            <Text style={styles.googleButtonText}>Sign In with Google</Text>
+          </View>
         </TouchableOpacity>
       </View>
 
