@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { Inter_300Light, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { LinearGradient } from 'expo-linear-gradient';
+import { CustomButton } from './components/CustomButton';
 
 // Empêcher le splash screen de se cacher automatiquement
 SplashScreen.preventAutoHideAsync();
@@ -86,22 +87,16 @@ export default function App() {
           <Text style={styles.forgotPassword}>Forgot your password?</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.buttonContainer} onPress={handleLogin}>
-          <LinearGradient
-            colors={['#3150C7', '#213993']}
-            start={{ x: 1, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.gradientButton}
-          >
-            <Text style={styles.signInButtonText}>Sign In</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+        <CustomButton
+          title="Sign In"
+          onPress={handleLogin}
+        />
 
-        <TouchableOpacity style={styles.googleButtonContainer} onPress={() => {}}>
-          <View style={styles.googleButtonInner}>
-            <Text style={styles.googleButtonText}>Sign In with Google</Text>
-          </View>
-        </TouchableOpacity>
+        <CustomButton
+          title="Sign In with Google"
+          variant="google"
+          onPress={() => {}}
+        />
       </View>
 
       <View style={styles.signUpContainer}>
@@ -173,11 +168,17 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     overflow: 'hidden',
   },
+  gradientBorder: {
+    flex: 1,
+    padding: 1,
+    borderRadius: 25,
+  },
   gradientButton: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
+    borderRadius: 25,
     shadowColor: '#4052DB',
     shadowOffset: {
       width: 0,
@@ -199,11 +200,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#E4E6EB',
-  },
-  gradientBorder: {
-    flex: 1,
-    padding: 2,
-    borderRadius: 25,
   },
   googleButtonInner: {
     flex: 1,

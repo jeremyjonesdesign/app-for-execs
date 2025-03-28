@@ -3,11 +3,18 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'rea
 import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { router, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { CustomButton } from '../components/CustomButton';
 
 // Étape 1 : Sélection du dashboard
-const DashboardStep = ({ onNext }: { onNext: () => void }) => {
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
-
+const DashboardStep = ({ 
+  onNext, 
+  selectedItems, 
+  setSelectedItems
+}: { 
+  onNext: () => void, 
+  selectedItems: number[],
+  setSelectedItems: React.Dispatch<React.SetStateAction<number[]>>
+}) => {
   const metrics = [
     { title: 'Revenue', value: '-84.2%', trend: '↓', current: '2,451€' },
     { title: 'Average Cart', value: '+12.8%', trend: '↑', current: '95€' },
@@ -80,43 +87,25 @@ const DashboardStep = ({ onNext }: { onNext: () => void }) => {
           </TouchableOpacity>
         ))}
       </ScrollView>
-
-      <TouchableOpacity 
-        style={[
-          styles.nextButton,
-          selectedItems.length === 0 && styles.nextButtonDisabled
-        ]} 
-        onPress={onNext}
-        disabled={selectedItems.length === 0}
-      >
-        <Text style={styles.nextButtonText}>Next</Text>
-      </TouchableOpacity>
     </View>
   );
 };
 
 // Étape 2 : Sélection des référents
-const ReferentsStep = ({ onNext }: { onNext: () => void }) => {
-  const [selectedReferents, setSelectedReferents] = useState<number[]>([]);
-
+const ReferentsStep = ({ 
+  onNext, 
+  selectedReferent,
+  setSelectedReferent
+}: { 
+  onNext: () => void, 
+  selectedReferent: number | null,
+  setSelectedReferent: React.Dispatch<React.SetStateAction<number | null>>
+}) => {
   const referents = [
+    { initials: 'JA', name: 'Jane Austin', role: 'Head of design', avatar: null },
     { initials: 'IA', name: 'Ilan Abehassera', role: 'VP Strategy', avatar: require('../../assets/images/ilan.png') },
     { initials: 'PC', name: 'Pierre-Louis Chinazzo', role: 'Pre-Sales', avatar: null },
-    { initials: 'TL', name: 'Thomas Lefebvre', role: 'Product Designer', avatar: null },
-    { initials: 'MB', name: 'Mathieu Brossard', role: 'Frontend Developer', avatar: null },
-    { initials: 'AR', name: 'Antoine Renault', role: 'Backend Developer', avatar: null },
-    { initials: 'LC', name: 'Laura Chen', role: 'Data Analyst', avatar: null },
   ];
-
-  const toggleReferent = (index: number) => {
-    setSelectedReferents(prev => {
-      if (prev.includes(index)) {
-        return prev.filter(item => item !== index);
-      } else {
-        return [...prev, index];
-      }
-    });
-  };
 
   return (
     <View style={styles.stepContainer}>
@@ -131,69 +120,42 @@ const ReferentsStep = ({ onNext }: { onNext: () => void }) => {
             activeOpacity={1}
             style={[
               styles.listItem,
-              selectedReferents.includes(index) && styles.listItemSelected
+              selectedReferent === index && styles.listItemSelected
             ]}
-            onPress={() => toggleReferent(index)}
+            onPress={() => setSelectedReferent(index)}
           >
             <View style={styles.referentLeftContent}>
               {referent.avatar ? (
                 <Image source={referent.avatar} style={styles.referentAvatar} />
               ) : (
-                <View style={[
-                  styles.referentInitials,
-                  selectedReferents.includes(index) && styles.referentInitialsSelected
-                ]}>
-                  <Text style={[
-                    styles.initialsText,
-                    selectedReferents.includes(index) && styles.initialsTextSelected
-                  ]}>
-                    {referent.initials}
-                  </Text>
+                <View style={styles.referentInitials}>
+                  <Text style={styles.initialsText}>{referent.initials}</Text>
                 </View>
               )}
               <View style={styles.referentInfo}>
                 <Text style={[
                   styles.referentName,
-                  selectedReferents.includes(index) && styles.referentNameSelected
+                  selectedReferent === index && styles.referentNameSelected
                 ]}>
                   {referent.name}
                 </Text>
-                <Text style={[
-                  styles.referentRole,
-                  selectedReferents.includes(index) && styles.referentRoleSelected
-                ]}>
-                  {referent.role}
-                </Text>
+                <Text style={styles.referentRole}>{referent.role}</Text>
               </View>
             </View>
-            <View style={[
-              styles.radioButton,
-              selectedReferents.includes(index) && styles.radioButtonSelected
-            ]}>
-              {selectedReferents.includes(index) && <View style={styles.radioButtonInner} />}
+            <View style={[styles.radioButton, selectedReferent === index && styles.radioButtonSelected]}>
+              {selectedReferent === index && <View style={styles.radioButtonInner} />}
             </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
-
-      <TouchableOpacity 
-        style={[
-          styles.nextButton,
-          selectedReferents.length === 0 && styles.nextButtonDisabled
-        ]} 
-        onPress={() => {
-          router.push('/screens/HomeScreen');
-        }}
-        disabled={selectedReferents.length === 0}
-      >
-        <Text style={styles.nextButtonText}>Terminer</Text>
-      </TouchableOpacity>
     </View>
   );
 };
 
 export default function OnboardingScreen() {
   const [currentStep, setCurrentStep] = useState(0);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [selectedReferent, setSelectedReferent] = useState<number | null>(null);
 
   const handleBack = () => {
     if (currentStep === 1) {
@@ -242,10 +204,34 @@ export default function OnboardingScreen() {
       />
       
       {currentStep === 0 ? (
-        <DashboardStep onNext={handleNextStep} />
+        <DashboardStep 
+          onNext={handleNextStep} 
+          selectedItems={selectedItems}
+          setSelectedItems={setSelectedItems}
+        />
       ) : (
-        <ReferentsStep onNext={() => router.push('/screens/HomeScreen')} />
+        <ReferentsStep 
+          onNext={() => router.push('/screens/HomeScreen')} 
+          selectedReferent={selectedReferent}
+          setSelectedReferent={setSelectedReferent}
+        />
       )}
+
+      <View style={styles.buttonContainer}>
+        <CustomButton
+          variant="next"
+          title={currentStep === 1 ? "Done" : "Next"}
+          onPress={() => {
+            if (currentStep === 1) {
+              router.push('/screens/HomeScreen');
+            } else {
+              setCurrentStep(prev => prev + 1);
+            }
+          }}
+          disabled={(currentStep === 0 && selectedItems.length === 0) || 
+                   (currentStep === 1 && selectedReferent === null)}
+        />
+      </View>
     </View>
   );
 }
@@ -347,22 +333,6 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: '#4052DB',
   },
-  nextButton: {
-    backgroundColor: '#4052DB',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginHorizontal: 16,
-    marginBottom: 20,
-  },
-  nextButtonDisabled: {
-    backgroundColor: '#E4E6EB',
-  },
-  nextButtonText: {
-    fontSize: 16,
-    fontFamily: 'Inter_600SemiBold',
-    color: '#fff',
-  },
   referentLeftContent: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -380,16 +350,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  referentInitialsSelected: {
-    backgroundColor: '#DCE2F6',
-  },
   initialsText: {
     fontSize: 16,
     fontFamily: 'Inter_600SemiBold',
     color: '#666',
-  },
-  initialsTextSelected: {
-    color: '#4052DB',
   },
   referentInfo: {
     marginLeft: 12,
@@ -406,7 +370,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter_400Regular',
     color: '#C2C5CD',
-    marginTop: 4,
   },
   referentRoleSelected: {
     color: '#4052DB',
@@ -428,5 +391,28 @@ const styles = StyleSheet.create({
     marginRight: 16,
     color: '#666',
     fontFamily: 'NewEdge',
+  },
+  buttonContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 40,
+    paddingTop: 20,
+    backgroundColor: 'transparent',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    shadowColor: '#fff',
+    shadowOffset: {
+      width: 0,
+      height: -20,
+    },
+    shadowOpacity: 0.9,
+    shadowRadius: 10,
+    elevation: 5,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backdropFilter: 'blur(10px)',
   },
 }); 
