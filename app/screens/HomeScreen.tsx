@@ -16,6 +16,7 @@ import { useState, useRef, useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BlurView } from 'expo-blur';
 import { CustomButton } from '../components/CustomButton';
+import { router } from 'expo-router';
 
 const generateDaysOfMonth = () => {
   const today = new Date();
@@ -366,7 +367,7 @@ export default function HomeScreen() {
         <CustomButton
           variant="sense"
           title="Ask Sense"
-          onPress={() => {}}
+          onPress={() => router.push('/screens/SenseChat')}
           icon={
             <Image 
               source={require('../../assets/images/sense-icon.png')} 
