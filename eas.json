@@ -1,0 +1,19 @@
+{
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {}
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "ascAppId": "6744031041" // L'ID de l'app dans App Store Connect
+      }
+    }
+  }
+}

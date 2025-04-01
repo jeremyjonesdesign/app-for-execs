@@ -1,11 +1,13 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle, View } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle, View, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+
+type ButtonVariant = 'primary' | 'secondary' | 'sense' | 'sense-icon';
 
 interface CustomButtonProps {
   onPress: () => void;
   title: string;
-  variant?: 'primary' | 'google';
+  variant?: ButtonVariant;
   style?: ViewStyle;
   textStyle?: TextStyle;
   disabled?: boolean;
@@ -34,6 +36,44 @@ export const CustomButton: React.FC<CustomButtonProps> = ({
         <View style={styles.googleButtonInner}>
           <Text style={[styles.googleButtonText, textStyle]}>{title}</Text>
         </View>
+      </TouchableOpacity>
+    );
+  }
+
+  if (variant === 'sense-icon') {
+    return (
+      <TouchableOpacity
+        style={[
+          styles.button,
+          {
+            backgroundColor: '#324FBE',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            borderRadius: 30,
+          }
+        ]}
+        onPress={onPress}
+      >
+        <Image 
+          source={require('../../assets/images/sense-icon.png')} 
+          style={{
+            width: 16,
+            height: 16,
+            marginRight: 8,
+            tintColor: '#fff',
+            marginTop: -6,
+          }}
+        />
+        <Text style={{
+          color: '#fff',
+          fontSize: 16,
+          fontFamily: 'NewEdge',
+        }}>
+          {title}
+        </Text>
       </TouchableOpacity>
     );
   }
@@ -117,5 +157,11 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.5,
+  },
+  button: {
+    height: 48,
+    marginBottom: 15,
+    borderRadius: 25,
+    overflow: 'hidden',
   },
 }); 

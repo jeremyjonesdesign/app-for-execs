@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native';
-import { LineChart } from 'react-native-chart-kit';
+import { LineChart as GiftedLineChart } from 'react-native-gifted-charts';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { format, eachDayOfInterval, startOfMonth, endOfMonth, isToday } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -17,6 +17,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BlurView } from 'expo-blur';
 import { CustomButton } from '../components/CustomButton';
 import { router } from 'expo-router';
+import { BurgerMenu } from '../components/BurgerMenu';
 
 const generateDaysOfMonth = () => {
   const today = new Date();
@@ -43,46 +44,46 @@ const generateDaysOfMonth = () => {
 const generateMetricData = (metricType: string) => {
   switch (metricType) {
     case 'Revenue':
-      const revenue = Math.floor(Math.random() * 4000000) + 1000000;
+      const revenue = Math.floor(Math.random() * 3000000) + 1000000;
       return {
         value: new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(revenue),
-        graphData: Array(7).fill(0).map(() => Math.floor(Math.random() * revenue))
+        graphData: Array(8).fill(0).map(() => Math.floor(Math.random() * (revenue * 0.8)))
       };
     case 'Average Cart':
       const avgCart = Math.floor(Math.random() * 1500) + 500;
       return {
         value: `${avgCart}€`,
-        graphData: Array(7).fill(0).map(() => Math.floor(Math.random() * avgCart))
+        graphData: Array(8).fill(0).map(() => Math.floor(Math.random() * avgCart))
       };
     case 'Conversation Rate':
       const convRate = (Math.random() * 3 + 1).toFixed(1);
       return {
         value: `${convRate}%`,
-        graphData: Array(7).fill(0).map(() => parseFloat((Math.random() * 3 + 1).toFixed(1)))
+        graphData: Array(8).fill(0).map(() => parseFloat((Math.random() * 3 + 1).toFixed(1)))
       };
     case 'Number of Sessions':
       const sessions = Math.floor(Math.random() * 1000) + 200;
       return {
         value: sessions.toString(),
-        graphData: Array(7).fill(0).map(() => Math.floor(Math.random() * sessions))
+        graphData: Array(8).fill(0).map(() => Math.floor(Math.random() * sessions))
       };
     case 'Session Time':
       const minutes = Math.floor(Math.random() * 8) + 2;
       const seconds = Math.floor(Math.random() * 60);
       return {
         value: `${minutes}min ${seconds}s`,
-        graphData: Array(7).fill(0).map(() => minutes * 60 + Math.floor(Math.random() * 60))
+        graphData: Array(8).fill(0).map(() => minutes * 60 + Math.floor(Math.random() * 60))
       };
     case 'Bounce Rate':
       const bounceRate = (Math.random() * 2).toFixed(2);
       return {
         value: `${bounceRate}%`,
-        graphData: Array(7).fill(0).map(() => parseFloat((Math.random() * 2).toFixed(2)))
+        graphData: Array(8).fill(0).map(() => parseFloat((Math.random() * 2).toFixed(2)))
       };
     default:
       return {
         value: '0',
-        graphData: Array(7).fill(0)
+        graphData: Array(8).fill(0)
       };
   }
 };
@@ -142,16 +143,21 @@ export default function HomeScreen() {
 
   const scrollViewRef = useRef(null);
   const [selectedDay, setSelectedDay] = useState(new Date());
-  const [revenueData, setRevenueData] = useState({
-    labels: ['8AM', '10', '12', '2PM', '4', '6', '8PM'],
-    datasets: [{
-      data: [20000, 45000, 28000, 80000, 99000, 43000, 50000]
-    }]
-  });
+  const [revenueData, setRevenueData] = useState([
+    { value: 20000 },
+    { value: 45000 },
+    { value: 28000 },
+    { value: 80000 },
+    { value: 99000 },
+    { value: 43000 },
+    { value: 50000 },
+    { value: 60000 }
+  ]);
   const [currentRevenue, setCurrentRevenue] = useState('3 001 264€');
   const [selectedMetric, setSelectedMetric] = useState('Revenue');
   const [metricsData, setMetricsData] = useState({});
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
   
   const days = generateDaysOfMonth();
 
@@ -217,12 +223,11 @@ export default function HomeScreen() {
   };
 
   const updateGraphData = (metric, data = metricsData) => {
-    setRevenueData({
-      labels: ['8 AM', '10', '12', '2 PM', '4', '6', '8'],
-      datasets: [{
-        data: data[metric].graphData
-      }]
-    });
+    const points = data[metric].graphData.map((value, index) => ({
+      value: value,
+      label: ['8AM', '10', '12', '2PM', '4', '6', '8', '10'][index]
+    }));
+    setRevenueData(points);
     setCurrentRevenue(data[metric].currentValue);
   };
 
@@ -249,7 +254,7 @@ export default function HomeScreen() {
       >
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => setIsMenuVisible(true)}>
               <Icon name="menu" size={24} color="#BCC6EB" />
             </TouchableOpacity>
             <Text style={styles.dateText}>
@@ -277,34 +282,37 @@ export default function HomeScreen() {
           <Text style={styles.revenueAmount}>{currentRevenue}</Text>
         </View>
 
-        <LineChart
-          data={revenueData}
-          width={Dimensions.get('window').width + 70}
-          height={180}
-          chartConfig={{
-            backgroundColor: 'transparent',
-            backgroundGradientFrom: 'transparent',
-            backgroundGradientTo: 'transparent',
-            decimalPlaces: 0,
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            propsForBackgroundLines: {
-              stroke: 'transparent',
-            },
-            fillShadowGradient: 'transparent',
-            fillShadowGradientOpacity: 0,
+        <GiftedLineChart
+          style={{
+            marginTop: 10,
           }}
-          bezier
-          style={[styles.chart, {
-            marginLeft: -35,
-            marginRight: -35,
-          }]}
-          withVerticalLabels={true}
-          withHorizontalLabels={false}
-          withVerticalLines={false}
-          withHorizontalLines={true}
-          withDots={true}
-          withShadow={true}
-          transparent={true}
+          data={revenueData}
+          height={120}
+          width={Dimensions.get('window').width + 40}
+          color="rgba(255,255,255,0.5)"
+          thickness={1}
+          curved={true}
+          dataPointsColor="rgba(255,255,255,0.8)"
+          dataPointsRadius={3}
+          areaChart={true}
+          startFillColor="#223C9E"
+          endFillColor="#1A2F7D"
+          xAxisLabelTextStyle={{
+            color: '#BCC6EB',
+            fontSize: 12,
+            fontFamily: 'Inter_300Light',
+            lineHeight: 22,
+            textAlign: 'center'
+          }}
+          showVerticalLines={false}
+          xAxisColor="transparent"
+          yAxisColor="transparent"
+          backgroundColor="transparent"
+          showHorizontalLines={false}
+          showGrid={false}
+          hideRules={true}
+          rulesType="none"
+          hideYAxisText={true}
         />
 
         <View style={styles.daysWrapper}>
@@ -365,17 +373,16 @@ export default function HomeScreen() {
 
       <View style={styles.footerContainer}>
         <CustomButton
-          variant="sense"
+          variant="sense-icon"
           title="Ask Sense"
           onPress={() => router.push('/screens/SenseChat')}
-          icon={
-            <Image 
-              source={require('../../assets/images/sense-icon.png')} 
-              style={styles.senseIcon}
-            />
-          }
         />
       </View>
+
+      <BurgerMenu 
+        isVisible={isMenuVisible}
+        onClose={() => setIsMenuVisible(false)}
+      />
     </View>
   );
 }
