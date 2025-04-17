@@ -5,8 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
-  Image,
-  TextInput
+  TextInput,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -20,7 +19,6 @@ interface BurgerMenuProps {
 export const BurgerMenu: React.FC<BurgerMenuProps> = ({ isVisible, onClose }) => {
   const translateX = React.useRef(new Animated.Value(-300)).current;
   const [searchText, setSearchText] = React.useState('');
-  const [inputFocused, setInputFocused] = React.useState(false);
 
   React.useEffect(() => {
     Animated.timing(translateX, {
@@ -30,17 +28,18 @@ export const BurgerMenu: React.FC<BurgerMenuProps> = ({ isVisible, onClose }) =>
     }).start();
   }, [isVisible]);
 
-  const chatHistory = [
-    { label: 'Why you revenue is dropping?', time: '28 min ago', route: '/chat/1', tag: 'Revenue' },
-    { label: 'Revenue forecast Q2', time: '1h ago', route: '/chat/2', tag: 'Forecast' },
-    { label: 'Customer segmentation', time: '2h ago', route: '/chat/3', tag: 'Customers' },
-    { label: 'Monthly report', time: '1d ago', route: '/chat/4', tag: 'Report' },
+  const menuItems = [
+    { icon: 'star', label: 'Sense History', badge: '542' },
+    { icon: 'dashboard', label: 'Dashboard' },
+    { icon: 'schedule', label: 'Journey Analysis' },
+    { icon: 'filter-alt', label: 'Funnel' },
+    { icon: 'compare', label: 'Page Comparator' },
+    { icon: 'grid-on', label: 'Zoning Analysis' },
+    { icon: 'play-circle-outline', label: 'Session Replay' },
+    { icon: 'error', label: 'Error Analysis' },
+    { icon: 'show-chart', label: 'Impact' },
+    { icon: 'insights', label: 'Insights' },
   ];
-
-  const filteredHistory = chatHistory.filter(item => 
-    item.label.toLowerCase().includes(searchText.toLowerCase()) ||
-    item.tag.toLowerCase().includes(searchText.toLowerCase())
-  );
 
   return (
     <>
@@ -63,54 +62,39 @@ export const BurgerMenu: React.FC<BurgerMenuProps> = ({ isVisible, onClose }) =>
         ]}
       >
         <View style={styles.searchContainer}>
-          <Icon 
-            name="search" 
-            size={20} 
-            color={inputFocused ? '#000' : '#8E8E93'} 
-          />
+          <Icon name="search" size={20} color="#8E8E93" />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search conversations"
+            placeholder="Search"
             placeholderTextColor="#8E8E93"
             value={searchText}
             onChangeText={setSearchText}
-            onFocus={() => setInputFocused(true)}
-            onBlur={() => setInputFocused(false)}
           />
-          {searchText !== '' && (
-            <TouchableOpacity 
-              onPress={() => setSearchText('')}
-              style={styles.clearButton}
-            >
-              <Icon name="close" size={16} color="#8E8E93" />
-            </TouchableOpacity>
-          )}
         </View>
 
         <View style={styles.menuItems}>
-          {filteredHistory.length === 0 ? (
-            <View style={styles.noResults}>
-              <Text style={styles.noResultsText}>No conversations found</Text>
-            </View>
-          ) : (
-            filteredHistory.map((item, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.menuItem}
-                onPress={() => {
-                  onClose();
-                }}
-              >
-                <View style={styles.chatItemContent}>
-                  <View style={styles.tagContainer}>
-                    <Text style={styles.tagText}>{item.tag}</Text>
-                  </View>
-                  <Text style={styles.menuItemText}>{item.label}</Text>
-                  <Text style={styles.timeText}>{item.time}</Text>
+          {menuItems.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.menuItem}
+              onPress={() => {
+                onClose();
+                if (item.label === 'Journey Analysis') {
+                  router.push('/screens/JourneyAnalysis' as any);
+                } else if (item.label === 'Dashboard') {
+                  router.replace('/screens/HomeScreen' as any);
+                }
+              }}
+            >
+              <Icon name={item.icon} size={24} color="#000" style={styles.menuIcon} />
+              <Text style={styles.menuItemText}>{item.label}</Text>
+              {item.badge && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{item.badge}</Text>
                 </View>
-              </TouchableOpacity>
-            ))
-          )}
+              )}
+            </TouchableOpacity>
+          ))}
         </View>
       </Animated.View>
     </>
@@ -133,96 +117,45 @@ const styles = StyleSheet.create({
     zIndex: 1001,
     paddingTop: 60,
   },
-  header: {
-    padding: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#324FBE',
-  },
-  logo: {
-    width: 32,
-    height: 32,
-    marginRight: 12,
-    tintColor: '#fff',
-  },
-  title: {
-    color: '#fff',
-    fontSize: 20,
-    fontFamily: 'NewEdge',
-  },
-  menuItems: {
-    marginTop: 20,
-  },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: '#F2F3F7',
     margin: 16,
     padding: 12,
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#EAEAEF',
-    shadowColor: 'rgba(0, 0, 0, 0.1)',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3,
-    elevation: 1,
   },
   searchInput: {
     flex: 1,
     marginLeft: 8,
     fontSize: 16,
-    color: '#9C9D9F',
-    fontFamily: 'Inter_300Light',
+    color: '#000',
   },
-  chatItemContent: {
-    flex: 1,
-  },
-  timeText: {
-    color: '#A8ACC2',
-    fontSize: 12,
-    marginTop: 4,
-    fontFamily: 'Inter_400Regular',
+  menuItems: {
+    marginTop: 20,
   },
   menuItem: {
     flexDirection: 'row',
+    alignItems: 'center',
     padding: 16,
     paddingLeft: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F2F2F7',
+  },
+  menuIcon: {
+    marginRight: 16,
   },
   menuItemText: {
-    fontSize: 14,
-    fontFamily: 'Inter_400Regular',
-    marginBottom: 4,
+    fontSize: 16,
     color: '#000',
+    flex: 1,
   },
-  tagContainer: {
-    backgroundColor: '#FFF',
+  badge: {
+    backgroundColor: '#F2F3F7',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
-    alignSelf: 'flex-start',
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: '#EAEAEF',
   },
-  tagText: {
-    color: '#9C9D9F',
+  badgeText: {
+    color: '#000',
     fontSize: 12,
-    fontFamily: 'Inter_400Regular',
-  },
-  clearButton: {
-    padding: 4,
-  },
-  noResults: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  noResultsText: {
-    color: '#8E8E93',
-    fontSize: 14,
-    fontFamily: 'Inter_400Regular',
   },
 }); 

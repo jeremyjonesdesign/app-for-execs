@@ -378,6 +378,7 @@ export default function HomeScreen() {
           onPress={() => router.push('/screens/SenseChat')}
         />
       </View>
+      
 
       <BurgerMenu 
         isVisible={isMenuVisible}
