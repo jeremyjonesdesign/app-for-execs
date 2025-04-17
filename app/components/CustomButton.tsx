@@ -2,7 +2,7 @@ import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle, View, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
-type ButtonVariant = 'primary' | 'secondary' | 'sense' | 'sense-icon';
+type ButtonVariant = 'primary' | 'secondary' | 'sense' | 'sense-icon' | 'google';
 
 interface CustomButtonProps {
   onPress: () => void;
@@ -42,38 +42,34 @@ export const CustomButton: React.FC<CustomButtonProps> = ({
 
   if (variant === 'sense-icon') {
     return (
-      <TouchableOpacity
+      <TouchableOpacity 
         style={[
-          styles.button,
-          {
-            backgroundColor: '#324FBE',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingHorizontal: 16,
-            paddingVertical: 12,
-            borderRadius: 30,
-          }
-        ]}
+          styles.buttonContainer, 
+          disabled && styles.disabledButton,
+          style
+        ]} 
         onPress={onPress}
+        disabled={disabled}
       >
-        <Image 
-          source={require('../../assets/images/sense-icon.png')} 
-          style={{
-            width: 16,
-            height: 16,
-            marginRight: 8,
-            tintColor: '#fff',
-            marginTop: -6,
-          }}
-        />
-        <Text style={{
-          color: '#fff',
-          fontSize: 16,
-          fontFamily: 'NewEdge',
-        }}>
-          {title}
-        </Text>
+        <LinearGradient
+          colors={['#1B3182', '#132259']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.gradientBorder}
+        >
+          <LinearGradient
+            colors={['#3150C7', '#213993']}
+            start={{ x: 1, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={[styles.gradientButton, styles.iconButtonContent]}
+          >
+            <Image 
+              source={require('../../assets/images/sense-icon.png')} 
+              style={styles.buttonIcon}
+            />
+            <Text style={[styles.buttonText, textStyle]}>{title}</Text>
+          </LinearGradient>
+        </LinearGradient>
       </TouchableOpacity>
     );
   }
@@ -163,5 +159,17 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 25,
     overflow: 'hidden',
+  },
+  buttonIcon: {
+    width: 16,
+    height: 16,
+    marginRight: 8,
+    tintColor: '#fff',
+    marginTop: -2,
+  },
+  iconButtonContent: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 }); 
